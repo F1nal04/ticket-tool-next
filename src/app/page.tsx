@@ -109,6 +109,16 @@ export default function Home() {
     }
   };
 
+  const isFormValid = () => {
+    if (!problemSource || !specificProblem) {
+      return false;
+    }
+    if (specificProblem === LaptopProblem.SOFTWARE_ISSUE && !softwareIssue) {
+      return false;
+    }
+    return true;
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-black to-green-900 flex items-center justify-center p-8">
       <div className="bg-white/10 backdrop-blur-sm rounded-lg p-8 w-full max-w-md">
@@ -242,6 +252,14 @@ export default function Home() {
               rows={4}
             />
           </div>
+
+          <Button
+            type="submit"
+            disabled={!isFormValid()}
+            className="w-full bg-green-600 hover:bg-green-700 text-white font-medium cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Submit Ticket
+          </Button>
         </form>
       </div>
     </div>
