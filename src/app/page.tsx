@@ -19,6 +19,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
 import {
   ProblemSource,
   LaptopProblem,
@@ -65,6 +66,7 @@ export default function Home() {
   const [specificProblem, setSpecificProblem] = useState<string>("");
   const [softwareIssue, setSoftwareIssue] = useState<string>("");
   const [date, setDate] = useState<Date>();
+  const [files, setFiles] = useState<FileList | undefined>(undefined);
 
   const getSecondSelectOptions = () => {
     switch (problemSource) {
@@ -187,7 +189,11 @@ export default function Home() {
                   )}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {date ? format(date, "PPP", { locale: de }) : <span>Pick a date</span>}
+                  {date ? (
+                    format(date, "PPP", { locale: de })
+                  ) : (
+                    <span>Pick a date</span>
+                  )}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -201,10 +207,25 @@ export default function Home() {
                   }}
                   weekStartsOn={1}
                   locale={de}
-                  initialFocus
                 />
               </PopoverContent>
             </Popover>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-white text-sm font-medium">Pictures</label>
+            <Input
+              type="file"
+              accept="image/*"
+              multiple
+              className="w-full bg-white/20 border-white/30 text-white file:bg-transparent file:text-white file:border-0 file:rounded-md file:px-3 file:py-1 file:mr-3 hover:bg-white/30"
+              onChange={(e) => setFiles(e.target.files || undefined)}
+            />
+            {files && files.length > 0 && (
+              <div className="text-white/70 text-sm">
+                {files.length} file{files.length > 1 ? "s" : ""} selected
+              </div>
+            )}
           </div>
         </form>
       </div>
