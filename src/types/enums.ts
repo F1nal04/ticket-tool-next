@@ -34,3 +34,13 @@ export enum MobileProblem {
 export enum OtherProblem {
   OTHER = "other",
 }
+
+export enum SoftwareIssues {
+  WINDOWS_UPDATE = "windows-update",
+  DRIVER_ISSUE = "driver-issue",
+  APPLICATION_CRASH = "application-crash",
+  VIRUS_MALWARE = "virus-malware",
+  PERFORMANCE_SLOW = "performance-slow",
+  STARTUP_ISSUE = "startup-issue",
+  OTHER = "other",
+}
