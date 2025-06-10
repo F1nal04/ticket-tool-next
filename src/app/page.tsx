@@ -132,12 +132,16 @@ export default function Home() {
               Problem Source
             </label>
             <Select onValueChange={handleProblemSourceChange}>
-              <SelectTrigger className="w-full bg-white/20 border-white/30 text-white">
+              <SelectTrigger className="w-full bg-white/20 border-white/30 text-white cursor-pointer">
                 <SelectValue placeholder="Select problem source" />
               </SelectTrigger>
               <SelectContent>
                 {Object.values(ProblemSource).map((source) => (
-                  <SelectItem key={source} value={source}>
+                  <SelectItem
+                    key={source}
+                    value={source}
+                    className="cursor-pointer"
+                  >
                     {problemLabels[source] || source}
                   </SelectItem>
                 ))}
@@ -154,12 +158,16 @@ export default function Home() {
               onValueChange={handleSpecificProblemChange}
               value={specificProblem}
             >
-              <SelectTrigger className="w-full bg-white/20 border-white/30 text-white disabled:opacity-50">
+              <SelectTrigger className="w-full bg-white/20 border-white/30 text-white disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed">
                 <SelectValue placeholder="Select specific problem" />
               </SelectTrigger>
               <SelectContent>
                 {getSecondSelectOptions().map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
+                  <SelectItem
+                    key={option.value}
+                    value={option.value}
+                    className="cursor-pointer"
+                  >
                     {option.label}
                   </SelectItem>
                 ))}
@@ -176,12 +184,16 @@ export default function Home() {
               value={softwareIssue}
               onValueChange={setSoftwareIssue}
             >
-              <SelectTrigger className="w-full bg-white/20 border-white/30 text-white disabled:opacity-50">
+              <SelectTrigger className="w-full bg-white/20 border-white/30 text-white disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed">
                 <SelectValue placeholder="Select software issue" />
               </SelectTrigger>
               <SelectContent>
                 {Object.values(SoftwareIssues).map((issue) => (
-                  <SelectItem key={issue} value={issue}>
+                  <SelectItem
+                    key={issue}
+                    value={issue}
+                    className="cursor-pointer"
+                  >
                     {problemLabels[issue] || issue}
                   </SelectItem>
                 ))}
@@ -196,7 +208,7 @@ export default function Home() {
                 <Button
                   variant="outline"
                   className={cn(
-                    "w-full justify-start text-left font-normal bg-white/20 border-white/30 text-white hover:bg-white/30",
+                    "w-full justify-start text-left font-normal bg-white/20 border-white/30 text-white hover:bg-white/30 cursor-pointer",
                     !date && "text-white/70"
                   )}
                 >
@@ -230,7 +242,7 @@ export default function Home() {
               type="file"
               accept="image/*"
               multiple
-              className="w-full bg-white/20 border-white/30 text-white file:bg-transparent file:text-white file:border-0 file:rounded-md file:px-3 file:py-1 file:mr-3 hover:bg-white/30"
+              className="w-full bg-white/20 border-white/30 text-white file:cursor-pointer file:bg-transparent file:text-white file:border-0 file:rounded-md file:px-3 file:py-1 file:mr-3 hover:bg-white/30"
               onChange={(e) => setFiles(e.target.files || undefined)}
             />
             {files && files.length > 0 && (
@@ -248,7 +260,7 @@ export default function Home() {
               placeholder="Describe the issue in detail..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full bg-white/20 border-white/30 text-white placeholder:text-white/50 resize-none"
+              className="w-full bg-white/20 border-white/30 text-white placeholder:text-white/50 resize-none cursor-text"
               rows={4}
             />
           </div>
@@ -256,7 +268,9 @@ export default function Home() {
           <Button
             type="submit"
             disabled={!isFormValid()}
-            className="w-full bg-green-600 hover:bg-green-700 text-white font-medium cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            className={cn(
+              "w-full bg-green-600 hover:bg-green-700 text-white font-medium cursor-pointer disabled:cursor-not-allowed disabled:pointer-events-auto disabled:opacity-50"
+            )}
           >
             Submit Ticket
           </Button>
