@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   ProblemSource,
   LaptopProblem,
@@ -67,6 +68,7 @@ export default function Home() {
   const [softwareIssue, setSoftwareIssue] = useState<string>("");
   const [date, setDate] = useState<Date>();
   const [files, setFiles] = useState<FileList | undefined>(undefined);
+  const [description, setDescription] = useState<string>("");
 
   const getSecondSelectOptions = () => {
     switch (problemSource) {
@@ -226,6 +228,19 @@ export default function Home() {
                 {files.length} file{files.length > 1 ? "s" : ""} selected
               </div>
             )}
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-white text-sm font-medium">
+              Description
+            </label>
+            <Textarea
+              placeholder="Describe the issue in detail..."
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="w-full bg-white/20 border-white/30 text-white placeholder:text-white/50 resize-none"
+              rows={4}
+            />
           </div>
         </form>
       </div>
