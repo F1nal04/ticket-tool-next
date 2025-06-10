@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { format } from "date-fns";
+import { de } from "date-fns/locale";
+import { CalendarIcon } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -8,6 +11,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 import {
   ProblemSource,
   LaptopProblem,
@@ -53,6 +64,7 @@ export default function Home() {
   const [problemSource, setProblemSource] = useState<string>("");
   const [specificProblem, setSpecificProblem] = useState<string>("");
   const [softwareIssue, setSoftwareIssue] = useState<string>("");
+  const [date, setDate] = useState<Date>();
 
   const getSecondSelectOptions = () => {
     switch (problemSource) {
@@ -161,6 +173,38 @@ export default function Home() {
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-white text-sm font-medium">Date</label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal bg-white/20 border-white/30 text-white hover:bg-white/30",
+                    !date && "text-white/70"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {date ? format(date, "PPP", { locale: de }) : <span>Pick a date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={date}
+                  onSelect={setDate}
+                  disabled={(date) => {
+                    const day = date.getDay();
+                    return day === 0 || day === 6; // Disable Sunday (0) and Saturday (6)
+                  }}
+                  weekStartsOn={1}
+                  locale={de}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
           </div>
         </form>
       </div>
