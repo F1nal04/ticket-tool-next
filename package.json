@@ -9,9 +9,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@radix-ui/react-popover": "^1.1.14",
-    "@radix-ui/react-select": "^2.2.5",
-    "@radix-ui/react-slot": "^1.2.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
@@ -22,7 +19,8 @@
     "react-day-picker": "^9.7.0",
     "react-dom": "^19.0.0",
     "sonner": "^2.0.5",
-    "tailwind-merge": "^3.3.0"
+    "tailwind-merge": "^3.3.0",
+    "radix-ui": "latest"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
