@@ -1,16 +1,64 @@
-import { Suspense } from "react";
-import { getTicket } from "@/lib/actions";
+"use client";
+
+import { useEffect, useState } from "react";
+import { getTicket, generateTicketSolution } from "@/lib/actions";
 import { format } from "date-fns";
 import { de } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { Ticket } from "@/types/ticket";
+import { readStreamableValue } from "ai/rsc";
 
-interface SolutionPageProps {
-  searchParams: Promise<{ id?: string }>;
-}
+function TicketDisplay({ id }: { id: string }) {
+  const [ticket, setTicket] = useState<Ticket | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [aiResponse, setAiResponse] = useState<string>('');
+  const [aiLoading, setAiLoading] = useState(false);
 
-async function TicketDisplay({ id }: { id: string }) {
-  const ticket = await getTicket(id);
+  useEffect(() => {
+    const fetchTicket = async () => {
+      try {
+        const ticketData = await getTicket(id);
+        setTicket(ticketData);
+        if (ticketData) {
+          generateSolution();
+        }
+      } catch (error) {
+        console.error('Error fetching ticket:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchTicket();
+    }
+  }, [id]);
+
+  const generateSolution = async () => {
+    setAiLoading(true);
+    setAiResponse('');
+    
+    try {
+      const { output } = await generateTicketSolution(id);
+      
+      for await (const delta of readStreamableValue(output)) {
+        if (delta) {
+          setAiResponse(prev => prev + delta);
+        }
+      }
+    } catch (error) {
+      console.error('Error generating solution:', error);
+      setAiResponse('Error generating solution. Please try again.');
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  if (loading) {
+    return <div className="text-white text-center">Loading ticket...</div>;
+  }
 
   if (!ticket) {
     return (
@@ -87,6 +135,34 @@ async function TicketDisplay({ id }: { id: string }) {
         </div>
       </div>
 
+      <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6">
+        <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
+          AI Solution
+          {aiLoading && (
+            <div className="w-4 h-4 border-2 border-green-400 border-t-transparent rounded-full animate-spin"></div>
+          )}
+        </h3>
+        <div className="text-white/80 whitespace-pre-wrap">
+          {aiResponse || (aiLoading ? "Generating solution..." : "Click to generate solution")}
+        </div>
+        {!aiResponse && !aiLoading && (
+          <Button 
+            onClick={generateSolution}
+            className="mt-4 bg-green-600 hover:bg-green-700"
+          >
+            Generate Solution
+          </Button>
+        )}
+        {aiResponse && !aiLoading && (
+          <Button 
+            onClick={generateSolution}
+            className="mt-4 bg-blue-600 hover:bg-blue-700"
+          >
+            Regenerate Solution
+          </Button>
+        )}
+      </div>
+
       <div className="text-center">
         <Link href="/">
           <Button className="bg-green-600 hover:bg-green-700">
@@ -98,17 +174,15 @@ async function TicketDisplay({ id }: { id: string }) {
   );
 }
 
-export default async function SolutionPage({ searchParams }: SolutionPageProps) {
-  const params = await searchParams;
-  const id = params.id;
+export default function SolutionPage() {
+  const searchParams = useSearchParams();
+  const id = searchParams.get('id');
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black to-green-900 flex items-center justify-center p-8">
       <div className="bg-white/10 backdrop-blur-sm rounded-lg p-8 w-full max-w-2xl">
         {id ? (
-          <Suspense fallback={<div className="text-white text-center">Loading ticket...</div>}>
-            <TicketDisplay id={id} />
-          </Suspense>
+          <TicketDisplay id={id} />
         ) : (
           <div className="text-center">
             <h2 className="text-xl font-semibold text-white mb-4">No Ticket ID Provided</h2>
