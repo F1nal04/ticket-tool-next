@@ -8,6 +8,7 @@ import { useSearchParams } from "next/navigation";
 import { Ticket } from "@/types/ticket";
 import { readStreamableValue } from "ai/rsc";
 import { useRouter } from "next/navigation";
+import ReactMarkdown from "react-markdown";
 
 function TicketDisplay({ id }: { id: string }) {
   const [ticket, setTicket] = useState<Ticket | null>(null);
@@ -97,8 +98,28 @@ function TicketDisplay({ id }: { id: string }) {
             <div className="w-4 h-4 border-2 border-green-400 border-t-transparent rounded-full animate-spin"></div>
           )}
         </h3>
-        <div className="text-white/80 whitespace-pre-wrap">
-          {aiResponse || (aiLoading ? "Generating solution..." : "Click to generate solution")}
+        <div className="text-white/80 prose prose-invert max-w-none">
+          {aiResponse ? (
+            <ReactMarkdown
+              components={{
+                h1: ({ children }) => <h1 className="text-xl font-bold text-white mb-3">{children}</h1>,
+                h2: ({ children }) => <h2 className="text-lg font-semibold text-white mb-2">{children}</h2>,
+                h3: ({ children }) => <h3 className="text-base font-medium text-white mb-2">{children}</h3>,
+                p: ({ children }) => <p className="text-white/80 mb-3 leading-relaxed">{children}</p>,
+                ul: ({ children }) => <ul className="list-disc list-inside text-white/80 mb-3 space-y-1">{children}</ul>,
+                ol: ({ children }) => <ol className="list-decimal list-inside text-white/80 mb-3 space-y-1">{children}</ol>,
+                li: ({ children }) => <li className="text-white/80">{children}</li>,
+                strong: ({ children }) => <strong className="font-semibold text-white">{children}</strong>,
+                em: ({ children }) => <em className="italic text-white/90">{children}</em>,
+                code: ({ children }) => <code className="bg-white/10 px-2 py-1 rounded text-green-300 font-mono text-sm">{children}</code>,
+                pre: ({ children }) => <pre className="bg-white/10 p-4 rounded-lg overflow-x-auto mb-3">{children}</pre>,
+              }}
+            >
+              {aiResponse}
+            </ReactMarkdown>
+          ) : (
+            <p>{aiLoading ? "Generating solution..." : "Click to generate solution"}</p>
+          )}
         </div>
         {!aiResponse && !aiLoading && (
           <Button 
