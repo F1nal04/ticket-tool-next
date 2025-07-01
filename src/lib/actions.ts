@@ -76,3 +76,9 @@ export async function generateTicketSolution(ticketId: string) {
   
   return { output: stream.value };
 }
+
+export async function deleteTicket(ticketId: string) {
+  const deleted = storage.delete(ticketId);
+  console.log(`Ticket ${ticketId} deleted: ${deleted}`);
+  return deleted;
+}

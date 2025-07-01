@@ -1,20 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getTicket, generateTicketSolution } from "@/lib/actions";
-import { format } from "date-fns";
-import { de } from "date-fns/locale";
+import { getTicket, generateTicketSolution, deleteTicket } from "@/lib/actions";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Ticket } from "@/types/ticket";
 import { readStreamableValue } from "ai/rsc";
+import { useRouter } from "next/navigation";
 
 function TicketDisplay({ id }: { id: string }) {
   const [ticket, setTicket] = useState<Ticket | null>(null);
   const [loading, setLoading] = useState(true);
   const [aiResponse, setAiResponse] = useState<string>('');
   const [aiLoading, setAiLoading] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchTicket = async () => {
@@ -56,6 +56,15 @@ function TicketDisplay({ id }: { id: string }) {
     }
   };
 
+  const handleNewTicket = async () => {
+    await deleteTicket(id);
+    router.push('/');
+  };
+
+  const handleMoreHelp = () => {
+    router.push(`/submit?id=${id}`);
+  };
+
   if (loading) {
     return <div className="text-white text-center">Loading ticket...</div>;
   }
@@ -77,62 +86,8 @@ function TicketDisplay({ id }: { id: string }) {
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-white mb-2">Ticket Details</h2>
-        <p className="text-green-400 font-mono text-lg">ID: {ticket.id}</p>
-      </div>
-
-      <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 space-y-4">
-        <div>
-          <h3 className="text-white font-semibold mb-2">Problem Information</h3>
-          <div className="space-y-2 text-white/80">
-            <p><span className="font-medium">Source:</span> {ticket.problemSource}</p>
-            <p><span className="font-medium">Specific Problem:</span> {ticket.specificProblem}</p>
-            {ticket.softwareIssue && (
-              <p><span className="font-medium">Software Issue:</span> {ticket.softwareIssue}</p>
-            )}
-          </div>
-        </div>
-
-        {ticket.date && (
-          <div>
-            <h3 className="text-white font-semibold mb-2">Date</h3>
-            <p className="text-white/80">{format(ticket.date, "PPP", { locale: de })}</p>
-          </div>
-        )}
-
-        {ticket.description && (
-          <div>
-            <h3 className="text-white font-semibold mb-2">Description</h3>
-            <p className="text-white/80 whitespace-pre-wrap">{ticket.description}</p>
-          </div>
-        )}
-
-        {ticket.files.length > 0 && (
-          <div>
-            <h3 className="text-white font-semibold mb-2">Attached Files</h3>
-            <div className="space-y-2">
-              {ticket.files.map((file, index) => (
-                <div key={index} className="bg-white/5 rounded p-3">
-                  <p className="text-white/80 font-medium">{file.name}</p>
-                  <p className="text-white/60 text-sm">{file.type}</p>
-                  {file.type.startsWith('image/') && (
-                    <img 
-                      src={file.base64} 
-                      alt={file.name}
-                      className="mt-2 max-w-full h-auto rounded border border-white/20"
-                    />
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div className="pt-4 border-t border-white/20">
-          <p className="text-white/60 text-sm">
-            Created: {format(ticket.createdAt, "PPP 'at' p", { locale: de })}
-          </p>
-        </div>
+        <h2 className="text-2xl font-bold text-white mb-2">AI Solution</h2>
+        <p className="text-green-400 font-mono text-lg">Ticket ID: {ticket.id}</p>
       </div>
 
       <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6">
@@ -163,12 +118,19 @@ function TicketDisplay({ id }: { id: string }) {
         )}
       </div>
 
-      <div className="text-center">
-        <Link href="/">
-          <Button className="bg-green-600 hover:bg-green-700">
-            Create Another Ticket
-          </Button>
-        </Link>
+      <div className="flex gap-4 justify-center">
+        <Button 
+          onClick={handleNewTicket}
+          className="bg-green-600 hover:bg-green-700"
+        >
+          Create Another Ticket
+        </Button>
+        <Button 
+          onClick={handleMoreHelp}
+          className="bg-blue-600 hover:bg-blue-700"
+        >
+          More Help Needed
+        </Button>
       </div>
     </div>
   );
