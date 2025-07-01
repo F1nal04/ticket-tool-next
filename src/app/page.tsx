@@ -29,6 +29,8 @@ import {
   OtherProblem,
   SoftwareIssues,
 } from "@/types/enums";
+import { saveTicket } from "@/lib/actions";
+import { TicketFile } from "@/types/ticket";
 
 const problemLabels: Record<string, string> = {
   // Problem Sources
@@ -119,6 +121,44 @@ export default function Home() {
     return true;
   };
 
+  const convertFilesToBase64 = async (fileList: FileList): Promise<TicketFile[]> => {
+    const promises = Array.from(fileList).map(file => {
+      return new Promise<TicketFile>((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          resolve({
+            name: file.name,
+            base64: reader.result as string,
+            type: file.type
+          });
+        };
+        reader.readAsDataURL(file);
+      });
+    });
+    return Promise.all(promises);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isFormValid()) return;
+
+    const formData = new FormData();
+    formData.append("problemSource", problemSource);
+    formData.append("specificProblem", specificProblem);
+    if (softwareIssue) formData.append("softwareIssue", softwareIssue);
+    if (date) formData.append("date", date.toISOString());
+    formData.append("description", description);
+    
+    if (files && files.length > 0) {
+      const base64Files = await convertFilesToBase64(files);
+      formData.append("files", JSON.stringify(base64Files));
+    } else {
+      formData.append("files", JSON.stringify([]));
+    }
+
+    await saveTicket(formData);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-black to-green-900 flex items-center justify-center p-8">
       <div className="bg-white/10 backdrop-blur-sm rounded-lg p-8 w-full max-w-md">
@@ -126,7 +166,7 @@ export default function Home() {
           Ticket Form
         </h1>
 
-        <form className="space-y-6">
+        <form className="space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-2">
             <label className="text-white text-sm font-medium">
               Problem Source
